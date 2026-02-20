@@ -34,4 +34,6 @@ yarn-error.log*
 data/*.db
 !data/testimonials.db
 data/uploads
+!data/uploads/
+!data/uploads/**
 testimonials-admin/
