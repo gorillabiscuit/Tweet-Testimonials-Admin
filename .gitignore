@@ -30,7 +30,8 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# drizzle
+# drizzle (keep testimonials.db in repo for deploy seed data)
 data/*.db
+!data/testimonials.db
 data/uploads
 testimonials-admin/
