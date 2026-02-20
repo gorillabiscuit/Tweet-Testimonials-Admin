@@ -5,15 +5,13 @@ import path from "path";
 import fs from "fs";
 
 export function buildTestimonialsJson(activeTestimonials: Testimonial[]): TestimonialsJson {
-  const columns: PublicTweet[][] = [[], [], [], [], []];
-  const singleColumn = activeTestimonials.map((t) => ({
+  const columns: PublicTweet[] = activeTestimonials.map((t) => ({
     id: t.id,
     profileImage: `/tweets/avatars/${t.avatarFileName}`,
     tweet: t.displayText || t.tweetText,
     handle: t.handle,
     date: t.date,
   }));
-  columns[0] = singleColumn;
   return { columns };
 }
 

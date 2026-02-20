@@ -27,5 +27,6 @@ export interface PublicTweet {
 }
 
 export interface TestimonialsJson {
-  columns: PublicTweet[][];
+  /** Single flat list of tweets; consumer distributes into columns (e.g. round-robin). */
+  columns: PublicTweet[];
 }
