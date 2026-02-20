@@ -60,23 +60,27 @@ export function TestimonialList() {
   };
 
   if (loading) {
-    return <p className="text-zinc-500">Loading…</p>;
+    return <p className="text-zinc-700">Loading…</p>;
   }
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-3 items-center">
         <input
+          id="search"
+          name="search"
           type="text"
           placeholder="Search handle or text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border border-zinc-300 rounded-lg px-3 py-2 text-sm w-56"
+          className="border border-zinc-300 rounded-lg px-3 py-2 text-sm w-56 text-zinc-900 bg-white"
         />
         <select
+          id="columnFilter"
+          name="columnFilter"
           value={columnFilter}
           onChange={(e) => setColumnFilter(e.target.value)}
-          className="border border-zinc-300 rounded-lg px-3 py-2 text-sm"
+          className="border border-zinc-300 rounded-lg px-3 py-2 text-sm text-zinc-900 bg-white"
         >
           <option value="">All columns</option>
           {[0, 1, 2, 3, 4].map((c) => (
@@ -86,9 +90,11 @@ export function TestimonialList() {
           ))}
         </select>
         <select
+          id="activeFilter"
+          name="activeFilter"
           value={activeFilter}
           onChange={(e) => setActiveFilter(e.target.value)}
-          className="border border-zinc-300 rounded-lg px-3 py-2 text-sm"
+          className="border border-zinc-300 rounded-lg px-3 py-2 text-sm text-zinc-900 bg-white"
         >
           <option value="">All</option>
           <option value="true">Active</option>
@@ -99,15 +105,15 @@ export function TestimonialList() {
       <div className="border border-zinc-200 rounded-lg bg-white overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-zinc-200 bg-zinc-50">
-              <th className="text-left p-3 font-medium">Avatar</th>
-              <th className="text-left p-3 font-medium">Name / Handle</th>
-              <th className="text-left p-3 font-medium">Tweet</th>
-              <th className="text-left p-3 font-medium">Col</th>
-              <th className="text-left p-3 font-medium">Order</th>
-              <th className="text-left p-3 font-medium">Status</th>
-              <th className="text-left p-3 font-medium">Updated</th>
-              <th className="text-left p-3 font-medium">Actions</th>
+            <tr className="border-b border-zinc-200 bg-zinc-100">
+              <th className="text-left p-3 font-medium text-zinc-900">Avatar</th>
+              <th className="text-left p-3 font-medium text-zinc-900">Name / Handle</th>
+              <th className="text-left p-3 font-medium text-zinc-900">Tweet</th>
+              <th className="text-left p-3 font-medium text-zinc-900">Col</th>
+              <th className="text-left p-3 font-medium text-zinc-900">Order</th>
+              <th className="text-left p-3 font-medium text-zinc-900">Status</th>
+              <th className="text-left p-3 font-medium text-zinc-900">Updated</th>
+              <th className="text-left p-3 font-medium text-zinc-900">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -121,24 +127,24 @@ export function TestimonialList() {
                   />
                 </td>
                 <td className="p-3">
-                  <div className="font-medium">{t.authorName}</div>
-                  <div className="text-zinc-500">{t.handle}</div>
+                  <div className="font-medium text-zinc-900">{t.authorName}</div>
+                  <div className="text-zinc-700">{t.handle}</div>
                 </td>
-                <td className="p-3 max-w-xs truncate">{t.tweetText || t.displayText}</td>
-                <td className="p-3">{t.columnIndex}</td>
-                <td className="p-3">{t.sortOrder}</td>
+                <td className="p-3 max-w-xs truncate text-zinc-800">{t.tweetText || t.displayText}</td>
+                <td className="p-3 text-zinc-800">{t.columnIndex}</td>
+                <td className="p-3 text-zinc-800">{t.sortOrder}</td>
                 <td className="p-3">
                   <span
                     className={
                       t.isActive
-                        ? "text-green-600 font-medium"
-                        : "text-zinc-400"
+                        ? "text-green-700 font-medium"
+                        : "text-zinc-600"
                     }
                   >
                     {t.isActive ? "Active" : "Inactive"}
                   </span>
                 </td>
-                <td className="p-3 text-zinc-500">{new Date(t.updatedAt).toLocaleDateString()}</td>
+                <td className="p-3 text-zinc-700">{new Date(t.updatedAt).toLocaleDateString()}</td>
                 <td className="p-3 flex items-center gap-1">
                   <button
                     type="button"
@@ -175,7 +181,7 @@ export function TestimonialList() {
           </tbody>
         </table>
         {items.length === 0 && (
-          <p className="p-6 text-zinc-500 text-center">No testimonials yet. Add one to get started.</p>
+          <p className="p-6 text-zinc-700 text-center">No testimonials yet. Click <strong>Add testimonial</strong> in the header to create one.</p>
         )}
       </div>
     </div>

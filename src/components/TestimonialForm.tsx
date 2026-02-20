@@ -117,10 +117,11 @@ export function TestimonialForm({
       )}
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 mb-1">Tweet URL *</label>
+        <label htmlFor="tweetUrl" className="block text-sm font-medium text-zinc-800 mb-1">Tweet URL *</label>
         <input
+          id="tweetUrl"
           {...form.register("tweetUrl")}
-          className="w-full border border-zinc-300 rounded-lg px-3 py-2"
+          className="w-full border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 bg-white"
           placeholder="https://x.com/..."
         />
         {form.formState.errors.tweetUrl && (
@@ -129,10 +130,11 @@ export function TestimonialForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 mb-1">Author name *</label>
+        <label htmlFor="authorName" className="block text-sm font-medium text-zinc-800 mb-1">Author name *</label>
         <input
+          id="authorName"
           {...form.register("authorName")}
-          className="w-full border border-zinc-300 rounded-lg px-3 py-2"
+          className="w-full border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 bg-white"
         />
         {form.formState.errors.authorName && (
           <p className="text-red-600 text-sm mt-1">{form.formState.errors.authorName.message}</p>
@@ -140,10 +142,11 @@ export function TestimonialForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 mb-1">Handle *</label>
+        <label htmlFor="handle" className="block text-sm font-medium text-zinc-800 mb-1">Handle *</label>
         <input
+          id="handle"
           {...form.register("handle")}
-          className="w-full border border-zinc-300 rounded-lg px-3 py-2"
+          className="w-full border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 bg-white"
           placeholder="@username"
         />
         {form.formState.errors.handle && (
@@ -152,10 +155,11 @@ export function TestimonialForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 mb-1">Tweet text *</label>
+        <label htmlFor="tweetText" className="block text-sm font-medium text-zinc-800 mb-1">Tweet text *</label>
         <textarea
+          id="tweetText"
           {...form.register("tweetText")}
-          className="w-full border border-zinc-300 rounded-lg px-3 py-2 min-h-[100px]"
+          className="w-full border border-zinc-300 rounded-lg px-3 py-2 min-h-[100px] text-zinc-900 bg-white"
           rows={4}
         />
         {form.formState.errors.tweetText && (
@@ -164,20 +168,22 @@ export function TestimonialForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 mb-1">Display text (optional)</label>
+        <label htmlFor="displayText" className="block text-sm font-medium text-zinc-800 mb-1">Display text (optional)</label>
         <textarea
+          id="displayText"
           {...form.register("displayText")}
-          className="w-full border border-zinc-300 rounded-lg px-3 py-2 min-h-[80px]"
+          className="w-full border border-zinc-300 rounded-lg px-3 py-2 min-h-[80px] text-zinc-900 bg-white"
           placeholder="Override for site; leave empty to use tweet text"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 mb-1">Date *</label>
+        <label htmlFor="date" className="block text-sm font-medium text-zinc-800 mb-1">Date *</label>
         <input
+          id="date"
           type="date"
           {...form.register("date")}
-          className="w-full border border-zinc-300 rounded-lg px-3 py-2"
+          className="w-full border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 bg-white"
         />
         {form.formState.errors.date && (
           <p className="text-red-600 text-sm mt-1">{form.formState.errors.date.message}</p>
@@ -186,10 +192,11 @@ export function TestimonialForm({
 
       <div className="flex gap-6">
         <div>
-          <label className="block text-sm font-medium text-zinc-700 mb-1">Column (0–4) *</label>
+          <label htmlFor="columnIndex" className="block text-sm font-medium text-zinc-800 mb-1">Column (0–4) *</label>
           <select
+            id="columnIndex"
             {...form.register("columnIndex", { valueAsNumber: true })}
-            className="border border-zinc-300 rounded-lg px-3 py-2"
+            className="border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 bg-white"
           >
             {[0, 1, 2, 3, 4].map((c) => (
               <option key={c} value={c}>
@@ -202,12 +209,13 @@ export function TestimonialForm({
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-zinc-700 mb-1">Sort order *</label>
+          <label htmlFor="sortOrder" className="block text-sm font-medium text-zinc-800 mb-1">Sort order *</label>
           <input
+            id="sortOrder"
             type="number"
             min={0}
             {...form.register("sortOrder", { valueAsNumber: true })}
-            className="w-24 border border-zinc-300 rounded-lg px-3 py-2"
+            className="w-24 border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 bg-white"
           />
           {form.formState.errors.sortOrder && (
             <p className="text-red-600 text-sm mt-1">{form.formState.errors.sortOrder.message}</p>
@@ -222,20 +230,22 @@ export function TestimonialForm({
           id="isActive"
           className="rounded border-zinc-300"
         />
-        <label htmlFor="isActive" className="text-sm font-medium text-zinc-700">
+        <label htmlFor="isActive" className="text-sm font-medium text-zinc-800">
           Active (included in export)
         </label>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 mb-1">
+        <label htmlFor="avatar" className="block text-sm font-medium text-zinc-800 mb-1">
           Avatar image {mode === "create" ? "*" : "(optional, replace)"}
         </label>
         <input
+          id="avatar"
+          name="avatar"
           type="file"
           accept="image/jpeg,image/png"
           onChange={(e) => setAvatarFile(e.target.files?.[0] ?? null)}
-          className="block w-full text-sm text-zinc-500 file:mr-3 file:py-2 file:px-3 file:rounded file:border file:border-zinc-300 file:bg-zinc-50"
+          className="block w-full text-sm text-zinc-700 file:mr-3 file:py-2 file:px-3 file:rounded file:border file:border-zinc-300 file:bg-white file:text-zinc-900"
         />
       </div>
 

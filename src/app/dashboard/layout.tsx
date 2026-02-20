@@ -22,13 +22,13 @@ export default async function DashboardLayout({
           </Link>
           <Link
             href="/dashboard/testimonials/new"
-            className="text-zinc-600 hover:text-zinc-900"
+            className="inline-flex items-center px-3 py-2 rounded-lg bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-800 transition"
           >
             Add testimonial
           </Link>
         </nav>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-zinc-500">{session.user.email}</span>
+          <span className="text-sm text-zinc-700">{session.user.email}</span>
           <SignOutButton />
         </div>
       </header>
