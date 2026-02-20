@@ -20,5 +20,6 @@ export async function getTestimonial(id: string) {
     columnIndex: row.columnIndex,
     sortOrder: row.sortOrder,
     isActive: row.isActive,
+    avatarFileName: row.avatarFileName,
   };
 }

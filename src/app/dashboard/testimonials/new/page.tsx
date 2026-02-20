@@ -5,7 +5,7 @@ export default function NewTestimonialPage() {
     <div>
       <h1 className="text-xl font-semibold text-zinc-900 mb-2">Add testimonial</h1>
       <p className="text-zinc-700 mb-6 max-w-xl">
-        Paste the tweet URL and fill in the author name, handle, and tweet text. Upload an avatar image (JPG or PNG). Column (0–4) and sort order control where it appears in the exported layout.
+        Paste the tweet URL and click <strong>Fetch from tweet</strong> — the app will fill in author, handle, tweet text, and avatar. Adjust column and sort order if needed, then click Create.
       </p>
       <TestimonialForm mode="create" />
     </div>

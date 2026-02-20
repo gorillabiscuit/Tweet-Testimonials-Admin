@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/SignIn";
 import Link from "next/link";
+import { UnsavedChangesProvider } from "@/contexts/UnsavedChangesContext";
+import { DashboardLink } from "@/components/DashboardLink";
 
 export default async function DashboardLayout({
   children,
@@ -14,12 +16,11 @@ export default async function DashboardLayout({
     redirect("/");
   }
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-3 flex items-center justify-between">
-        <nav className="flex items-center gap-4">
-          <Link href="/dashboard" className="font-medium text-zinc-900 hover:text-zinc-600">
-            Dashboard
-          </Link>
+    <UnsavedChangesProvider>
+      <div className="min-h-screen bg-zinc-50">
+        <header className="border-b border-zinc-200 bg-white px-6 py-3 flex items-center justify-between">
+          <nav className="flex items-center gap-4">
+            <DashboardLink />
           <Link
             href="/dashboard/testimonials/new"
             className="inline-flex items-center px-3 py-2 rounded-lg bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-800 transition"
@@ -32,7 +33,8 @@ export default async function DashboardLayout({
           <SignOutButton />
         </div>
       </header>
-      <main className="p-6">{children}</main>
-    </div>
+        <main className="p-6">{children}</main>
+      </div>
+    </UnsavedChangesProvider>
   );
 }

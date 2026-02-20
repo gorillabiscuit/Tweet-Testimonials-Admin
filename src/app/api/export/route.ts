@@ -19,7 +19,7 @@ export async function GET() {
     .select()
     .from(testimonials)
     .where(eq(testimonials.isActive, true))
-    .orderBy(asc(testimonials.columnIndex), asc(testimonials.sortOrder));
+    .orderBy(asc(testimonials.sortOrder));
 
   const activeTestimonials: Testimonial[] = rows.map((r) => ({
     id: r.id,

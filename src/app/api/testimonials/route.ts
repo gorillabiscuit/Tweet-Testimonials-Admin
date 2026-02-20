@@ -16,12 +16,9 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("search") ?? "";
-  const columnIndexParam = searchParams.get("columnIndex");
   const isActiveParam = searchParams.get("isActive");
 
-  let query = db.select().from(testimonials).orderBy(asc(testimonials.columnIndex), asc(testimonials.sortOrder));
-
-  const rows = await db.select().from(testimonials).orderBy(asc(testimonials.columnIndex), asc(testimonials.sortOrder));
+  const rows = await db.select().from(testimonials).orderBy(asc(testimonials.sortOrder));
   let filtered = rows;
   if (search) {
     const s = search.toLowerCase();
@@ -31,9 +28,6 @@ export async function GET(request: NextRequest) {
         r.tweetText.toLowerCase().includes(s) ||
         r.authorName.toLowerCase().includes(s)
     );
-  }
-  if (columnIndexParam !== null && columnIndexParam !== "" && !Number.isNaN(Number(columnIndexParam))) {
-    filtered = filtered.filter((r) => r.columnIndex === Number(columnIndexParam));
   }
   if (isActiveParam === "true" || isActiveParam === "false") {
     filtered = filtered.filter((r) => r.isActive === (isActiveParam === "true"));
@@ -80,10 +74,16 @@ export async function POST(request: NextRequest) {
     const tweetText = formData.get("tweetText") as string;
     const displayText = (formData.get("displayText") as string) ?? "";
     const date = formData.get("date") as string;
-    const columnIndex = Number(formData.get("columnIndex"));
-    const sortOrder = formData.get("sortOrder") !== null && formData.get("sortOrder") !== "" ? Number(formData.get("sortOrder")) : 0;
     const isActive = formData.get("isActive") === "true" || formData.get("isActive") === "on";
     const file = formData.get("avatar") as File | null;
+    const fetchedAvatarToken = (formData.get("fetchedAvatarToken") as string) ?? "";
+    const insertPositionRaw = formData.get("insertPosition") as string | null;
+    let insertPosition: "top" | "bottom" | { afterId: string } = "bottom";
+    if (insertPositionRaw === "top" || insertPositionRaw === "bottom") {
+      insertPosition = insertPositionRaw;
+    } else if (insertPositionRaw && insertPositionRaw.startsWith("after:")) {
+      insertPosition = { afterId: insertPositionRaw.slice(6) };
+    }
     body = {
       tweetUrl,
       authorName,
@@ -91,9 +91,9 @@ export async function POST(request: NextRequest) {
       tweetText,
       displayText,
       date,
-      columnIndex: Number.isNaN(columnIndex) ? 0 : columnIndex,
-      sortOrder: Number.isNaN(sortOrder) ? 0 : sortOrder,
       isActive,
+      insertPosition,
+      fetchedAvatarToken: fetchedAvatarToken || undefined,
     };
     if (file && file.size > 0) {
       avatarFile = {
@@ -102,20 +102,21 @@ export async function POST(request: NextRequest) {
         size: file.size,
         arrayBuffer: () => file.arrayBuffer(),
       };
+    } else if (fetchedAvatarToken && /^temp-[a-f0-9-]+\.(jpg|jpeg|png)$/i.test(fetchedAvatarToken)) {
+      avatarFile = { fetchedToken: fetchedAvatarToken } as unknown as { name: string; type: string; size: number; arrayBuffer: () => Promise<ArrayBuffer> };
     }
   } else {
     body = await request.json();
   }
 
-  const { tweetUrl, authorName, handle, tweetText, displayText, date, columnIndex, sortOrder, isActive } = body as {
+  const { tweetUrl, authorName, handle, tweetText, displayText, date, insertPosition, isActive } = body as {
     tweetUrl: string;
     authorName: string;
     handle: string;
     tweetText: string;
     displayText?: string;
     date: string;
-    columnIndex: number;
-    sortOrder?: number;
+    insertPosition?: "top" | "bottom" | { afterId: string };
     isActive?: boolean;
   };
 
@@ -126,14 +127,44 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const col = Math.min(4, Math.max(0, Number(columnIndex) || 0));
-  const order = typeof sortOrder === "number" && Number.isInteger(sortOrder) ? sortOrder : 0;
-
-  const id = uuidv4();
   const now = new Date().toISOString();
+  const id = uuidv4();
+  const position = insertPosition ?? "bottom";
+  const existing = await db.select().from(testimonials).orderBy(asc(testimonials.sortOrder));
+  let newSortOrder: number;
+  if (position === "top") {
+    newSortOrder = 0;
+    for (const r of existing) {
+      await db.update(testimonials).set({ sortOrder: r.sortOrder + 1, updatedAt: now }).where(eq(testimonials.id, r.id));
+    }
+  } else if (position === "bottom") {
+    newSortOrder = existing.length;
+  } else {
+    const afterRow = existing.find((r) => r.id === position.afterId);
+    if (!afterRow) {
+      return NextResponse.json({ error: "Invalid insertPosition: afterId not found" }, { status: 400 });
+    }
+    newSortOrder = afterRow.sortOrder + 1;
+    for (const r of existing) {
+      if (r.sortOrder >= newSortOrder) {
+        await db.update(testimonials).set({ sortOrder: r.sortOrder + 1, updatedAt: now }).where(eq(testimonials.id, r.id));
+      }
+    }
+  }
 
+  const avatarFileAny = avatarFile as { fetchedToken?: string; name?: string; type?: string; size?: number; arrayBuffer?: () => Promise<ArrayBuffer> } | null;
   let avatarFileName = "";
-  if (avatarFile) {
+  if (avatarFileAny?.fetchedToken) {
+    const avatarsDir = getAvatarsDir();
+    const tempPath = path.join(avatarsDir, avatarFileAny.fetchedToken);
+    if (!fs.existsSync(tempPath)) {
+      return NextResponse.json({ error: "Fetched avatar expired. Please fetch again or upload an image." }, { status: 400 });
+    }
+    const ext = path.extname(avatarFileAny.fetchedToken);
+    avatarFileName = `${id}${ext}`;
+    const destPath = path.join(avatarsDir, avatarFileName);
+    fs.renameSync(tempPath, destPath);
+  } else if (avatarFile) {
     if (!ALLOWED_AVATAR_TYPES.includes(avatarFile.type) || avatarFile.size > MAX_AVATAR_SIZE_BYTES) {
       return NextResponse.json({ error: "Invalid avatar file type or size" }, { status: 400 });
     }
@@ -145,7 +176,7 @@ export async function POST(request: NextRequest) {
     const buf = await avatarFile.arrayBuffer();
     fs.writeFileSync(destPath, Buffer.from(buf));
   } else {
-    return NextResponse.json({ error: "Avatar file is required when creating a testimonial" }, { status: 400 });
+    return NextResponse.json({ error: "Avatar is required. Use “Fetch from tweet” or upload an image." }, { status: 400 });
   }
 
   await db.insert(testimonials).values({
@@ -158,8 +189,8 @@ export async function POST(request: NextRequest) {
     tweetText,
     displayText: displayText ?? "",
     date: date.slice(0, 10),
-    columnIndex: col,
-    sortOrder: order,
+    columnIndex: 0,
+    sortOrder: newSortOrder,
     channel: "x",
     createdAt: now,
     updatedAt: now,
@@ -167,5 +198,5 @@ export async function POST(request: NextRequest) {
   });
 
   const [row] = await db.select().from(testimonials).where(eq(testimonials.id, id));
-  return NextResponse.json(row ? rowToTestimonial(row) : { id, tweetUrl, handle, tweetText, date, columnIndex: col, sortOrder: order });
+  return NextResponse.json(row ? rowToTestimonial(row) : { id, tweetUrl, handle, tweetText, date, columnIndex: 0, sortOrder: newSortOrder });
 }
